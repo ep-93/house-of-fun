@@ -33,9 +33,9 @@ jobs:
 
       - name: Create a change
         run: |
-          mkdir -p codey
-          echo "Another change " >> test2.txt
-          git add test2.txt
+          mkdir -p code
+          echo "Another change " >> test.txt
+          git add test.txt
       # Run steps that make changes to the local repo here.
 
       # Commit all changed files back to the repository
