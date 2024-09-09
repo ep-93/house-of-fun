@@ -30,6 +30,7 @@ jobs:
       - name: Create a change
         working-directory: code
         run: |
+          ls -R /home/runner/work/house-of-fun/house-of-fun
           touch test1.txt
           git add test1.txt
       # Run steps that make changes to the local repo here.
