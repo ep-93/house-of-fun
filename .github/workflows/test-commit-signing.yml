@@ -30,8 +30,8 @@ jobs:
       - name: Create a change
         working-directory: code
         run: |
-          echo "Another change " >> test.txt
-          git add test.txt
+          touch test1.txt
+          git add test1.txt
       # Run steps that make changes to the local repo here.
 
       # Commit all changed files back to the repository
