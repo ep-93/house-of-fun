@@ -1,3 +1,4 @@
+
 name: fmt
 
 on:
@@ -29,13 +30,13 @@ jobs:
 
       - name: List current directory structure
         run: ls -R /home/runner/work/house-of-fun/house-of-fun
-  
+
       - name: Create a change
         run: |
           mkdir -p code
           touch code/test1.txt
           git add code/test1.txt
-  
+      # Run steps that make changes to the local repo here.
 
       # Commit all changed files back to the repository
       - uses: planetscale/ghcommit-action@v0.1.6
