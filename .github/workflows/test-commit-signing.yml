@@ -34,8 +34,8 @@ jobs:
       - name: Create a change
         run: |
           mkdir -p code
-          touch code/test1.txt
-          git add code/test1.txt
+          echo "Another change " >> test.txt
+          git add test.txt
       # Run steps that make changes to the local repo here.
 
       # Commit all changed files back to the repository
