@@ -46,7 +46,8 @@ jobs:
           repositoryNameWithOwner="ep-93/house-of-fun"  # Combine owner and repository name
       
           # Define the commit message as a key-value object (headline and body)
-          message=$(jq -n --arg headline "Automated commit" --arg body "This commit was created via the GitHub GraphQL API." '{"headline": $headline, "body": $body}')
+          message_headline="Automated commit"
+          message_body="This commit was created via the GitHub GraphQL API."
       
           # Convert file content to Base64 encoding
           filePath="README.md"  # The file you want to modify
@@ -64,7 +65,8 @@ jobs:
           payload=$(jq -n \
             --arg mutation "$mutation" \
             --arg branch "$branch" \
-            --arg message "$message" \
+            --arg message_headline "$message_headline" \
+            --arg message_body "$message_body" \
             --arg filePath "$filePath" \
             --arg base64FileContent "$base64FileContent" \
             --arg repositoryNameWithOwner "$repositoryNameWithOwner" \
@@ -77,7 +79,10 @@ jobs:
                     "repositoryNameWithOwner": $repositoryNameWithOwner,
                     "branchName": $branch
                   },
-                  "message": $message,
+                  "message": {
+                    "headline": $message_headline,
+                    "body": $message_body
+                  },
                   "fileChanges": {
                     "additions": [{
                       "path": $filePath,
@@ -96,4 +101,4 @@ jobs:
             -H "Content-Type: application/json" \
             -d "$payload" \
             https://api.github.com/graphql
-       
+      
