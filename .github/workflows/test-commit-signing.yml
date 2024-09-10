@@ -45,8 +45,8 @@ jobs:
           branch="feature/signed-commits-testing"  # Target branch
           repositoryNameWithOwner="ep-93/house-of-fun"  # Combine owner and repository name
       
-          # Define the commit message as a key-value object
-          message=$(jq -n --arg headline "Automated commit" --arg body "This commit was created via GitHub GraphQL API" '{"headline": $headline, "body": $body}')
+          # Define the commit message as a single string
+          message="Automated commit via GitHub GraphQL API"
       
           # Convert file content to Base64 encoding
           filePath="README.md"  # The file you want to modify
@@ -87,13 +87,5 @@ jobs:
                   "expectedHeadOid": $expectedHeadOid
                 }
               }
-            }'
-          )
+            }
       
-          # Make the API call
-          curl -X POST \
-            -H "Authorization: bearer $GITHUB_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d "$payload" \
-            https://api.github.com/graphql
-       
