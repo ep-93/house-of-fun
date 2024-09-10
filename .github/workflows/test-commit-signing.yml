@@ -41,31 +41,49 @@ jobs:
             }
           }'
           
-          # Define the input payload for the mutation
-          branch="feature/signed-commits-testing"  # Update with your target branch
-          message="Automated commit via GraphQL"
-          filePath="README.md"  # Update with the file you want to modify
+          # Define the branch and repository
+          branch="feature/signed-commits-testing"  # Target branch
+          repositoryNameWithOwner="ep-93/house-of-fun"  # Combine owner and repository name
+      
+          # Define the commit message as a key-value object
+          message=$(jq -n --arg headline "Automated commit" --arg body "This commit was created via GitHub GraphQL API" '{"headline": $headline, "body": $body}')
+      
+          # Convert file content to Base64 encoding
+          filePath="README.md"  # The file you want to modify
           fileContent="This is an automated update."
+          base64FileContent=$(echo -n "$fileContent" | base64)
+      
+          # Get the latest commit SHA for the branch (expectedHeadOid)
+          expectedHeadOid=$(curl -s -X POST \
+            -H "Authorization: bearer $GITHUB_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"query": "query { repository(name: \"house-of-fun\", owner: \"ep-93\") { ref(qualifiedName: \"refs/heads/'$branch'\") { target { ... on Commit { oid } } } } }" }' \
+            https://api.github.com/graphql | jq -r '.data.repository.ref.target.oid')
       
           # Create the payload for the mutation
           payload=$(jq -n \
             --arg branch "$branch" \
             --arg message "$message" \
             --arg filePath "$filePath" \
-            --arg fileContent "$fileContent" \
-            --arg mutation "$mutation" \
+            --arg base64FileContent "$base64FileContent" \
+            --arg repositoryNameWithOwner "$repositoryNameWithOwner" \
+            --arg expectedHeadOid "$expectedHeadOid" \
             '{
               "query": $mutation,
               "variables": {
                 "input": {
-                  "branch": { "repositoryName": "house-of-fun", "ownerName": "ep-93", "branchName": $branch },
+                  "branch": {
+                    "repositoryNameWithOwner": $repositoryNameWithOwner,
+                    "branchName": $branch
+                  },
                   "message": $message,
                   "fileChanges": {
                     "additions": [{
                       "path": $filePath,
-                      "contents": $fileContent
+                      "contents": $base64FileContent
                     }]
-                  }
+                  },
+                  "expectedHeadOid": $expectedHeadOid
                 }
               }
             }'
