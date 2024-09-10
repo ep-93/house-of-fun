@@ -42,7 +42,7 @@ jobs:
           }'
           
           # Define the branch and repository
-          branch="feature/signed-commits-testing"  # Target branch
+          branch="main"  # Target branch
           repositoryNameWithOwner="ep-93/house-of-fun"  # Combine owner and repository name
       
           # Define the commit message as a key-value object (headline and body)
