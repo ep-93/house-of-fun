@@ -33,28 +33,27 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Define GraphQL mutation
-          mutation='
-          mutation($input: CreateCommitOnBranchInput!) {
+          mutation='mutation($input: CreateCommitOnBranchInput!) {
             createCommitOnBranch(input: $input) {
               commit {
                 url
               }
             }
-          }
-          '
+          }'
           
           # Define the input payload for the mutation
           branch="feature/signed-commits-testing"  # Update with your target branch
           message="Automated commit via GraphQL"
           filePath="README.md"  # Update with the file you want to modify
           fileContent="This is an automated update."
-
+      
           # Create the payload for the mutation
           payload=$(jq -n \
             --arg branch "$branch" \
             --arg message "$message" \
             --arg filePath "$filePath" \
             --arg fileContent "$fileContent" \
+            --arg mutation "$mutation" \
             '{
               "query": $mutation,
               "variables": {
@@ -71,10 +70,11 @@ jobs:
               }
             }'
           )
-
+      
           # Make the API call
           curl -X POST \
             -H "Authorization: bearer $GITHUB_TOKEN" \
             -H "Content-Type: application/json" \
             -d "$payload" \
             https://api.github.com/graphql
+      
