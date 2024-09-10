@@ -87,5 +87,13 @@ jobs:
                   "expectedHeadOid": $expectedHeadOid
                 }
               }
-            }
+            }'
+          )
+      
+          # Make the API call
+          curl -X POST \
+            -H "Authorization: bearer $GITHUB_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$payload" \
+            https://api.github.com/graphql
       
