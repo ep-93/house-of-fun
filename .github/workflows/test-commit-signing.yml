@@ -1,4 +1,3 @@
-
 name: fmt
 
 on:
@@ -36,6 +35,8 @@ jobs:
           mkdir -p code
           echo "Another change " >> test.txt
           git add test.txt
+      # Run steps that make changes to the local repo here.
+
       # Run steps that make changes to the local repo here.
 
       # Commit all changed files back to the repository
