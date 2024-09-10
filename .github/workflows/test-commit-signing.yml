@@ -28,21 +28,53 @@ jobs:
       - name: Setup git
         run: echo ${{ github.head_ref || github.ref_name }}
 
-      - name: List current directory structure
-        run: ls -R /home/runner/work/house-of-fun/house-of-fun
-  
-      - name: Create a change
-        run: |
-          mkdir -p code
-          touch code/test1.txt
-          git add code/test1.txt
-  
-
-      # Commit all changed files back to the repository
-      - uses: planetscale/ghcommit-action@v0.1.6
-        with:
-          commit_message: "🤖 fmt"
-          repo: ${{ github.repository }}
-          branch: ${{ github.head_ref || github.ref_name }}
+      - name: Create Commit on Branch using GraphQL API
         env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Define GraphQL mutation
+          mutation='
+          mutation($input: CreateCommitOnBranchInput!) {
+            createCommitOnBranch(input: $input) {
+              commit {
+                url
+              }
+            }
+          }
+          '
+          
+          # Define the input payload for the mutation
+          branch="feature/signed-commits-testing"  # Update with your target branch
+          message="Automated commit via GraphQL"
+          filePath="README.md"  # Update with the file you want to modify
+          fileContent="This is an automated update."
+
+          # Create the payload for the mutation
+          payload=$(jq -n \
+            --arg branch "$branch" \
+            --arg message "$message" \
+            --arg filePath "$filePath" \
+            --arg fileContent "$fileContent" \
+            '{
+              "query": $mutation,
+              "variables": {
+                "input": {
+                  "branch": { "repositoryName": "house-of-fun", "ownerName": "ep-93", "branchName": $branch },
+                  "message": $message,
+                  "fileChanges": {
+                    "additions": [{
+                      "path": $filePath,
+                      "contents": $fileContent
+                    }]
+                  }
+                }
+              }
+            }'
+          )
+
+          # Make the API call
+          curl -X POST \
+            -H "Authorization: bearer $GITHUB_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$payload" \
+            https://api.github.com/graphql
