@@ -1,2 +1,1 @@
-# house-of-fun
-Welcome
+This is an automated update.
